@@ -2,7 +2,15 @@
 
 [![CI](https://github.com/mesutyilmaz19907-max/RD-Desktop/actions/workflows/ci.yml/badge.svg)](https://github.com/mesutyilmaz19907-max/RD-Desktop/actions/workflows/ci.yml)
 
-RD Desktop is a desktop client for Real-Debrid with one shared Python/Tk codebase and separate Windows and Linux release builds.
+RD Desktop is a modern desktop client for Real-Debrid, built with a single shared Python/Tk codebase and packaged separately for Windows and Linux.
+
+It brings common Real-Debrid tasks into a clean desktop interface, including torrent management, magnet and `.torrent` uploads, file selection, link unrestricting, download management, history, account information, and secure device-based authentication.
+
+The project is designed to stay lightweight, responsive, and easy to use while keeping platform-specific behavior properly separated between Windows and Linux.
+
+**Important:** RD Desktop is only a client for the Real-Debrid service. It does not provide downloads, hosting, cached content, or premium access by itself. A valid **Real-Debrid Premium account is required** for the application to be useful. Without an active Real-Debrid Premium subscription, most of the app's functionality will not work.
+
+RD Desktop is an independent project and is not affiliated with or endorsed by Real-Debrid.
 
 ## Supported platforms
 
