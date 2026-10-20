@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=RD Desktop
+Comment=Real-Debrid desktop client
+Exec=RD-Desktop
+Terminal=false
+Categories=Network;

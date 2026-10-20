@@ -1,0 +1,2 @@
+# Linux stores OAuth credentials in the desktop Secret Service/keyring.
+keyring>=25.5,<26; platform_system == "Linux"
