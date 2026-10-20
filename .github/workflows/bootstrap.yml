@@ -4,6 +4,10 @@ on:
   push:
     paths:
       - ".github/workflows/bootstrap.yml"
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - ".bootstrap-trigger"
   workflow_dispatch:
 
 permissions:
