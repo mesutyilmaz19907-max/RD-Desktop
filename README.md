@@ -4,8 +4,6 @@
 
 RD Desktop is a desktop client for Real-Debrid with one shared Python/Tk codebase and separate Windows and Linux release builds.
 
-The 1.3.2 source tree keeps the existing modern UI while replacing the older mixed Windows/application backend with a cross-platform core for authentication, API access, downloads, persistence, and operating-system integration.
-
 ## Supported platforms
 
 - Windows 10/11, x64
