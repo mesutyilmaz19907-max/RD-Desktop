@@ -1,0 +1,100 @@
+name: Bootstrap RD Desktop v1.3.2
+
+on:
+  push:
+    paths:
+      - ".github/workflows/bootstrap.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.publish.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct verified source
+        shell: bash
+        run: |
+          cat .bootstrap-xz/chunk-*.b64 > /tmp/source.b64
+          base64 -d /tmp/source.b64 > /tmp/source.tar.xz
+          echo "8ffbd15728ec657233b24cf8ed51d89ac1950887654f5582a3fcc902e15f4d45  /tmp/source.tar.xz" | sha256sum -c -
+          mkdir -p /tmp/source
+          tar -xJf /tmp/source.tar.xz -C /tmp/source
+
+      - name: Publish clean source
+        id: publish
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan clean-main
+          git rm -rf . || true
+          git clean -fdx || true
+          cp -a /tmp/source/. .
+          git add -A
+          git commit -m "RD Desktop v1.3.2"
+          sha="$(git rev-parse HEAD)"
+          git push --force origin HEAD:main
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+  windows:
+    needs: bootstrap
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Build Windows artifact
+        shell: pwsh
+        run: ./packaging/windows/build.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: RD-Desktop-Windows-x64.zip
+
+  linux:
+    needs: bootstrap
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Install Linux build prerequisites
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-tk xvfb
+      - name: Build Linux artifact
+        shell: bash
+        run: xvfb-run -a ./packaging/linux/build.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: RD-Desktop-Linux-x86_64.tar.gz
+
+  publish:
+    needs: [bootstrap, windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Publish v1.3.2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release create v1.3.2 release-assets/* \
+            --repo "${{ github.repository }}" \
+            --target "${{ needs.bootstrap.outputs.sha }}" \
+            --title "RD Desktop v1.3.2" \
+            --generate-notes
