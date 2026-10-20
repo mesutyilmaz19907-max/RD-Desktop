@@ -20,6 +20,9 @@ def ui_root():
     ui_theme.configure_theme(root)
     errors=[]
     root.report_callback_exception=lambda typ,exc,tb:errors.append(exc)
+    # Finish mapping the owner before tests open transient popups. Windows
+    # delivers its initial Configure events after idle layout has completed.
+    root.update()
     yield root
     root.update()
     root.destroy()

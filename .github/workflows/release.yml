@@ -26,7 +26,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - shell: pwsh
+      - name: Test and build Windows archive
+        shell: pwsh
         run: ./packaging/windows/build.ps1
       - uses: actions/upload-artifact@v4
         with:
@@ -42,7 +43,8 @@ jobs:
         with:
           python-version: '3.12'
       - run: sudo apt-get update && sudo apt-get install -y python3-tk xvfb
-      - run: xvfb-run -a ./packaging/linux/build.sh
+      - name: Test and build Linux archive
+        run: xvfb-run -a ./packaging/linux/build.sh
       - uses: actions/upload-artifact@v4
         with:
           name: RD-Desktop-Linux-x86_64
