@@ -1,0 +1,7 @@
+include CHANGELOG.md
+include *.py
+recursive-include .github/workflows *.yml
+recursive-include assets *.png *.json *.svg *.md *.txt
+recursive-include packaging *.py *.sh *.ps1 *.desktop
+recursive-include tests *.py
+recursive-include tools *.py

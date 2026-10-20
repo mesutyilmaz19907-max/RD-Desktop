@@ -1,5 +1,7 @@
 # RD Desktop 1.3.2
 
+[![CI](https://github.com/mesutyilmaz19907-max/RD-Desktop/actions/workflows/ci.yml/badge.svg)](https://github.com/mesutyilmaz19907-max/RD-Desktop/actions/workflows/ci.yml)
+
 RD Desktop is a desktop client for Real-Debrid with one shared Python/Tk codebase and separate Windows and Linux release builds.
 
 The 1.3.2 source tree keeps the existing modern UI while replacing the older mixed Windows/application backend with a cross-platform core for authentication, API access, downloads, persistence, and operating-system integration.
@@ -37,8 +39,11 @@ rdclient/
 packaging/
   windows/build.ps1
   linux/build.sh
+  linux/package.py
+  checksums.py
 .github/workflows/
   ci.yml
+  build.yml
   release.yml
 tests/
 ```
@@ -102,9 +107,39 @@ Linux:
 ./packaging/linux/build.sh
 ```
 
-The Windows build produces `RD-Desktop-Windows-x64.zip`. The Linux build produces `RD-Desktop-Linux-x86_64.tar.gz`. Both are generated from the same source version.
+The Windows build produces `RD-Desktop-Windows-x64.zip`. A local Linux build produces `RD-Desktop-Linux-x86_64.tar.gz`. CI includes the target distro in Linux archive names so builds from different system libraries stay distinguishable.
 
-GitHub Actions tests both operating systems and builds both artifacts from a release tag, a manual workflow run, or a version/release-workflow change pushed to `main`. After both builds pass, the workflow publishes a GitHub Release using the version in `pyproject.toml`.
+After a Linux build, create a native package on the matching distribution:
+
+```bash
+# Debian/Ubuntu; requires dpkg-deb
+python packaging/linux/package.py --format deb --target ubuntu-24.04
+
+# Fedora; requires rpmbuild
+python packaging/linux/package.py --format rpm --target fedora-44
+```
+
+Native packages install the application in `/opt/rd-desktop`, provide the `rd-desktop` command, and add an application-menu entry. They declare a minimum glibc version matching their build environment. Use the package for your distro; a frozen executable built with newer system libraries may not work on an older distro. A working desktop keyring is still needed for persistent login.
+
+## Continuous integration and downloads
+
+Every push and pull request runs syntax/undefined-name checks, tests on Windows and Ubuntu with Python 3.10, 3.12, and 3.14, and the following native package builds:
+
+| Target | Architecture | Build artifacts |
+| --- | --- | --- |
+| Ubuntu 22.04 | x86_64 | `.deb`, `.tar.gz` |
+| Ubuntu 24.04 | x86_64 | `.deb`, `.tar.gz` |
+| Debian 12 | x86_64 | `.deb`, `.tar.gz` |
+| Debian 13 | x86_64 | `.deb`, `.tar.gz` |
+| Fedora 44 | x86_64 | `.rpm`, `.tar.gz` |
+| Windows | x64 | `.zip` |
+| Python package | platform independent source/wheel | `.whl`, source `.tar.gz` |
+
+Each Linux build uses its distro's own Python and libraries in a container, runs the full test suite under Xvfb, installs the resulting native package, and checks the installed executable. The Windows build checks the packaged executable. The Python package job installs the wheel into a clean virtual environment outside the source tree and checks the bundled icon data.
+
+Download build artifacts and their SHA-256 manifests from the **Artifacts** section of a successful [CI run](https://github.com/mesutyilmaz19907-max/RD-Desktop/actions/workflows/ci.yml). CI artifacts are retained for 14 days. The **Run workflow** button can also start CI manually.
+
+Release tags, manual release runs, and version/release-workflow changes on `main` use the same package-build workflow. After all package builds pass, the release workflow publishes the distro packages, archives, Python packages, and a combined `SHA256SUMS` file. If the current version already belongs to another commit, a normal CI change skips publishing; bump the version before publishing the next release.
 
 ## Tests
 

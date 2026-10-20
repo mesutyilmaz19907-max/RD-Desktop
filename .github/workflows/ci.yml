@@ -3,27 +3,57 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test-linux:
-    runs-on: ubuntu-latest
+  quality:
+    name: Python syntax and undefined names
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
-      - run: sudo apt-get update && sudo apt-get install -y python3-tk xvfb
+      - run: python -m pip install ruff
+      - run: ruff check --select E9,F63,F7,F82 rdclient tests packaging tools 'RD Desktop.py'
+
+  tests:
+    name: Tests / ${{ matrix.os }} / Python ${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+        python: ['3.10', '3.12', '3.14']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install Linux display dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y python3-tk xvfb xauth
       - run: python -m pip install -e '.[dev]'
-      - run: xvfb-run -a python -m pytest
+      - run: python -m pip check
+      - name: Test Linux UI and backend
+        if: runner.os == 'Linux'
+        run: xvfb-run -a python -m pytest
+      - name: Test Windows UI and backend
+        if: runner.os == 'Windows'
+        run: python -m pytest
       - run: python -m rdclient --self-test
 
-  test-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: python -m pip install -e ".[dev]"
-      - run: python -m pytest
-      - run: python -m rdclient --self-test
+  packages:
+    name: Compile and verify packages
+    uses: ./.github/workflows/build.yml

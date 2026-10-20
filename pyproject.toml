@@ -19,11 +19,11 @@ dev = ["pytest>=8", "pyinstaller>=6.10"]
 rd-desktop = "rdclient.launcher:main"
 
 [tool.setuptools]
-packages = ["rdclient"]
+packages = ["rdclient", "rdclient.assets"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
 
 [tool.setuptools.package-data]
-rdclient = ["assets/*.json"]
+rdclient = ["assets/*.json", "assets/*.txt"]

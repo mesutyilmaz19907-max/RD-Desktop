@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Compile and verify distro-specific Ubuntu 22.04/24.04, Debian 12/13, and Fedora 44 packages in CI.
+- Build native DEB/RPM installers, Windows archives, Python wheels/source distributions, and SHA-256 manifests.
+- Test Python 3.10, 3.12, and 3.14 on Linux and Windows; verify native package installation and wheel assets.
+- Share package build jobs with releases and skip publishing an already-released version from a different commit.
+
 ## 1.3.0
 
 Backend rewrite with the existing modern UI retained.

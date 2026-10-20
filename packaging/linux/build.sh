@@ -7,4 +7,9 @@ python -m PyInstaller --noconfirm --clean --windowed --onedir \
   --collect-data rdclient \
   'RD Desktop.py'
 ./dist/RD-Desktop/RD-Desktop --self-test
-tar -C dist -czf dist/RD-Desktop-Linux-x86_64.tar.gz RD-Desktop
+target="${RD_LINUX_TARGET:-}"
+if [[ -n "$target" && ! "$target" =~ ^[a-z0-9][a-z0-9.-]*$ ]]; then
+  echo 'RD_LINUX_TARGET must be a distro identifier such as ubuntu-24.04.' >&2
+  exit 1
+fi
+tar -C dist -czf "dist/RD-Desktop-Linux-${target:+$target-}x86_64.tar.gz" RD-Desktop
