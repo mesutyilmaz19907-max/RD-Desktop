@@ -64,3 +64,5 @@ jobs:
 
           echo "Could not dispatch release workflow" >&2
           exit 1
+
+# retrigger after verified bootstrap chunk correction
