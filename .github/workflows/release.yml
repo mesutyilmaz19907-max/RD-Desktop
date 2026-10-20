@@ -37,7 +37,7 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          version=$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')
+          version=$(python -c 'import tomllib; from rdclient import __version__; from rdclient.constants import APP_VERSION; version = tomllib.load(open("pyproject.toml", "rb"))["project"]["version"]; assert version == APP_VERSION == __version__, "Application and package versions must match"; print(version)')
           tag="v$version"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           if [[ "$GITHUB_REF" == refs/tags/* && "$GITHUB_REF_NAME" != "$tag" ]]; then
@@ -70,6 +70,9 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
       - uses: actions/download-artifact@v8
         with:
           path: release-assets
@@ -91,8 +94,26 @@ jobs:
           RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
         run: |
           set -euo pipefail
+          python packaging/release_notes.py --tag "$RELEASE_TAG" --output release-notes.md
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --notes-file release-notes.md --latest
             gh release upload "$RELEASE_TAG" release-assets/* --clobber
           else
-            gh release create "$RELEASE_TAG" release-assets/* --target "$GITHUB_SHA" --generate-notes --title "RD Desktop $RELEASE_TAG"
+            gh release create "$RELEASE_TAG" release-assets/* --target "$GITHUB_SHA" --notes-file release-notes.md --title "RD Desktop $RELEASE_TAG" --latest
+          fi
+      - name: Retire the mistakenly numbered development release
+        if: needs.prepare.outputs.tag == 'v1.0.0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # Keep its assets in a recoverable draft; only remove the known development tag.
+          if old_sha=$(gh api "repos/$GH_REPO/git/ref/tags/v1.3.2" --jq '.object.sha' 2>/dev/null); then
+            if [[ "$old_sha" != 0d6f20e328e909e0bbfdf86b246d85ed5294f6fb ]]; then
+              echo '::error::The development tag has changed; inspect it before retiring it.'
+              exit 1
+            fi
+            gh release edit v1.3.2 --draft
+            gh api --method DELETE "repos/$GH_REPO/git/refs/tags/v1.3.2"
           fi

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 APP_NAME = "RD Desktop"
 APP_ID = "rd-desktop"
-APP_VERSION = "1.3.2"
+APP_VERSION = "1.0.0"
 USER_AGENT = f"RD-Desktop/{APP_VERSION}"
 
 REST_BASE = "https://api.real-debrid.com/rest/1.0"

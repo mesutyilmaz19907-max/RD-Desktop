@@ -1,39 +1,16 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 — 2026-10-20
 
-- Compile and verify distro-specific Ubuntu 22.04/24.04, Debian 12/13, and Fedora 44 packages in CI.
-- Build native DEB/RPM installers, Windows archives, Python wheels/source distributions, and SHA-256 manifests.
-- Test Python 3.10, 3.12, and 3.14 on Linux and Windows; verify native package installation and wheel assets.
-- Share package build jobs with releases and skip publishing an already-released version from a different commit.
+First public release of RD Desktop for Windows and Linux.
 
-## 1.3.0
+- Manage Real-Debrid torrents, upload magnets and `.torrent` files, and choose which files to download.
+- Skip duplicate torrents and repeated items before uploading them to Real-Debrid.
+- Unrestrict links and manage resumable downloads with queue persistence, pause/resume controls, and completion checks.
+- View account information and download history in a themed, multilingual desktop interface.
+- Sign in through the Real-Debrid OAuth device flow, with credentials protected by Windows DPAPI or the Linux desktop keyring.
+- Open files and folders through the operating system; use native `.torrent` drag-and-drop on Windows and the upload action on Linux.
+- Install Windows x64 builds, Ubuntu 22.04/24.04 and Debian 12/13 DEB packages, or Fedora 44 RPM packages. Linux portable archives and Python wheel/source packages are also included.
+- Verify downloads with the included `SHA256SUMS` file. CI tests supported Python versions, compiles each platform's packages, and checks native installation and startup.
 
-Backend rewrite with the existing modern UI retained.
-
-- Replaced the duplicated legacy/modern application inheritance with a lean shared controller and one modern UI application.
-- Rebuilt the Real-Debrid OAuth/REST client with request pacing, bounded retries, token refresh locking, response validation, and authorization diagnostics.
-- Removed legacy password/2FA and private-token authentication paths from the public desktop flow.
-- Added Windows DPAPI and Linux system-keyring credential backends; removed Linux plaintext/base64 storage.
-- Added XDG config/data locations on Linux and migration away from the old `~/.rd-desktop/config.json` secret file.
-- Rebuilt local download transfers around resumable `.part` files with completion-size validation and atomic promotion.
-- Added serialized atomic queue persistence and safer restart/shutdown reconciliation.
-- Added cross-platform file/folder opening and Linux desktop theme detection.
-- Fixed stale folder-unrestrict download state and the Treeview empty-state overlay regression.
-- Preserved unsaved form/results state when switching language.
-- Kept native `.torrent` drag/drop on Windows while making the Linux UI accurately advertise upload-button behavior.
-- Replaced VBS launchers with a Python package/entry point and release build scripts.
-- Added Windows/Linux CI and tagged GitHub release workflows.
-- Added regression tests for OAuth polling, truncated downloads, destination permissions, and legacy Linux secret migration.
-
-## 1.3.1
-
-- Check torrent/magnet info hashes against the existing Real-Debrid torrent list before adding.
-- Skip already-existing torrents before upload, file-list polling, or automatic file selection.
-- De-duplicate repeated torrents inside the same batch without extra Real-Debrid add calls.
-- Show skipped items separately from failed items in the upload queue.
-
-## 1.3.2
-
-- Fix first Shift-click range selection in the main Treeview lists by maintaining an explicit selection anchor.
-- Preserve Ctrl+Shift additive range selection and normal Ctrl-click behavior.
+A Real-Debrid Premium account is required. RD Desktop is an independent client and is not affiliated with or endorsed by Real-Debrid.

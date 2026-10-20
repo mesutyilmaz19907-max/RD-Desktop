@@ -4,13 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rd-desktop"
-version = "1.3.2"
+version = "1.0.0"
 description = "Cross-platform desktop client for Real-Debrid"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
   "keyring>=25.5,<26; platform_system == 'Linux'",
 ]
+
+[project.urls]
+Homepage = "https://github.com/mesutyilmaz19907-max/RD-Desktop"
+Releases = "https://github.com/mesutyilmaz19907-max/RD-Desktop/releases"
+Issues = "https://github.com/mesutyilmaz19907-max/RD-Desktop/issues"
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pyinstaller>=6.10"]

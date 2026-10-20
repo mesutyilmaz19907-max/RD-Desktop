@@ -1,6 +1,8 @@
-# RD Desktop 1.3.2
+# RD Desktop 1.0.0
 
 [![CI](https://github.com/mesutyilmaz19907-max/RD-Desktop/actions/workflows/ci.yml/badge.svg)](https://github.com/mesutyilmaz19907-max/RD-Desktop/actions/workflows/ci.yml)
+
+**First public release: [v1.0.0](https://github.com/mesutyilmaz19907-max/RD-Desktop/releases/tag/v1.0.0).**
 
 RD Desktop is a modern desktop client for Real-Debrid, built with a single shared Python/Tk codebase and packaged separately for Windows and Linux.
 
@@ -159,7 +161,7 @@ On a headless Linux machine:
 xvfb-run -a python -m pytest
 ```
 
-The 1.3.2 source includes regression coverage for OAuth credential polling and incomplete/truncated downloads in addition to the existing UI/application tests.
+The test suite covers OAuth credential polling, incomplete/truncated downloads, secure configuration migration, duplicate torrent checks, and native UI interactions.
 
 ## Behavioral notes
 
